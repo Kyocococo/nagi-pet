@@ -54,9 +54,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // Use gemini-2.5-flash for fast and cost-effective responses
+    // Use gemini-1.5-flash for fast and cost-effective responses
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: systemInstruction,
       generationConfig: {
         responseMimeType: "application/json",
