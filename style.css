@@ -1,10 +1,10 @@
 :root {
-  --bg-color: #0f172a;
-  --panel-bg: rgba(30, 41, 59, 0.7);
-  --text-color: #f1f5f9;
+  --bg-color: #e0f2fe;
+  --panel-bg: rgba(255, 255, 255, 0.7);
+  --text-color: #1e293b;
   --accent-color: #38bdf8;
-  --border-color: rgba(148, 163, 184, 0.2);
-  --sky-gradient: radial-gradient(circle at top right, #1e293b, #020617);
+  --border-color: rgba(148, 163, 184, 0.3);
+  --sky-gradient: radial-gradient(circle at top left, #bae6fd, #e0f2fe);
 }
 
 body[data-theme="morning"] {
@@ -85,26 +85,23 @@ body {
   position: absolute;
   top: 40px;
   right: 40px;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: #fde047;
-  box-shadow: 0 0 40px #fef08a, 0 0 80px #fde047;
-  opacity: 0;
-  transition: opacity 2s ease, transform 2s ease;
-  transform: translateY(20px);
-}
-
-body[data-theme="morning"] .sun {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-body[data-theme="afternoon"] .sun {
+  box-shadow: 0 0 50px #fde047, 0 0 100px rgba(253, 224, 71, 0.5);
   opacity: 0.9;
-  background: #fb923c;
-  box-shadow: 0 0 40px #fdba74, 0 0 80px #fb923c;
-  transform: translateY(100px);
+  z-index: 0;
+  animation: rotateSun 20s linear infinite;
+}
+
+@keyframes rotateSun {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+body[data-theme="night"] .sun {
+  opacity: 0;
 }
 
 .moon {
@@ -116,15 +113,14 @@ body[data-theme="afternoon"] .sun {
   border-radius: 50%;
   background: #fef08a;
   box-shadow: 0 0 30px #fef08a;
-  opacity: 0.8;
+  opacity: 0;
   transition: opacity 2s ease, transform 2s ease;
-  transform: translateY(0);
+  transform: translateY(-20px);
 }
 
-body[data-theme="morning"] .moon,
-body[data-theme="afternoon"] .moon {
-  opacity: 0;
-  transform: translateY(-20px);
+body[data-theme="night"] .moon {
+  opacity: 0.8;
+  transform: translateY(0);
 }
 
 .stars {
@@ -134,19 +130,28 @@ body[data-theme="afternoon"] .moon {
   width: 100%;
   height: 100%;
   background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 50%),
+    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 40%),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 30%);
+  background-size: 200% 200%;
+  animation: floatClouds 60s ease-in-out infinite alternate;
+  opacity: 0.7;
+}
+
+@keyframes floatClouds {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+body[data-theme="night"] .stars {
+  background-image: 
     radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
     radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
     radial-gradient(1.5px 1.5px at 90px 40px, #fff, rgba(0,0,0,0)),
     radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
-  background-repeat: repeat;
   background-size: 200px 200px;
+  animation: none;
   opacity: 0.3;
-  transition: opacity 2s ease;
-}
-
-body[data-theme="morning"] .stars,
-body[data-theme="afternoon"] .stars {
-  opacity: 0;
 }
 
 .cat-image-container {
@@ -211,16 +216,35 @@ body[data-theme="afternoon"] .stars {
 }
 
 /* Play Animation */
-.play-animation {
-  animation: playJump 1s cubic-bezier(0.28, 0.84, 0.42, 1) !important;
+.anim-jump {
+  animation: playJump 0.8s cubic-bezier(0.28, 0.84, 0.42, 1) !important;
 }
 
 @keyframes playJump {
   0% { transform: translateY(0) scale(1); }
-  25% { transform: translateY(-30px) scale(1.05) rotate(-5deg); }
-  50% { transform: translateY(0) scale(1) rotate(5deg); }
-  75% { transform: translateY(-15px) scale(1.02) rotate(-3deg); }
-  100% { transform: translateY(0) scale(1) rotate(0); }
+  25% { transform: translateY(-30px) scale(0.9, 1.1); }
+  50% { transform: translateY(0) scale(1.1, 0.9); }
+  75% { transform: translateY(-15px) scale(1); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.anim-stretch {
+  animation: playStretch 2s ease-in-out !important;
+}
+
+@keyframes playStretch {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15, 0.85) translateY(15px); }
+}
+
+.anim-swing {
+  animation: playSwing 1.5s ease-in-out !important;
+}
+
+@keyframes playSwing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg) translateX(10px); }
+  75% { transform: rotate(-10deg) translateX(-10px); }
 }
 
 .chat-container {
