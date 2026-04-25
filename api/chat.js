@@ -116,8 +116,8 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Error in chat API:", error);
     return res.status(500).json({ 
-      error: "Failed to fetch response from AI",
-      reply: "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。",
+      error: "Failed to fetch response from AI: " + (error.message || String(error)),
+      reply: "ごめんね、エラーが起きたみたい：「" + (error.message || String(error)) + "」",
       emotion: "sad"
     });
   }
