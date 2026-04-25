@@ -116,12 +116,13 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Error in chat API:", error);
     const isRateLimit = String(error).includes("429") || String(error).includes("exceeded your current quota");
+    const errMsg = String(error.message || error);
     
     return res.status(500).json({ 
       error: "Failed to fetch response from AI",
       reply: isRateLimit 
-        ? "にゃあ...少し話しすぎちゃって疲れちゃったみたい。1分くらい休んでからまた話しかけてね。"
-        : "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。",
+        ? "にゃあ...少し話しすぎちゃって疲れちゃったみたい。(" + errMsg + ")"
+        : "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。(" + errMsg + ")",
       emotion: "sleepy"
     });
   }
