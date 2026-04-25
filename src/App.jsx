@@ -20,7 +20,15 @@ export default function App() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [animClass, setAnimClass] = useState('anim-float');
   const messagesEndRef = useRef(null);
+
+  const triggerAnim = (anim) => {
+    setAnimClass(anim);
+    setTimeout(() => {
+      setAnimClass(prev => prev === anim ? 'anim-float' : prev);
+    }, 2000);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -48,16 +56,22 @@ export default function App() {
       // Simple rule-based keywords
       if (input.includes('疲れた') || input.includes('つかれた')) {
         responseText = "よしよし...本当にお疲れ様。僕のふわふわの毛並みを想像して癒やされてね。";
+        triggerAnim('anim-stretch');
       } else if (input.includes('おはよう')) {
         responseText = "にゃあ！おはよう。今日も無理せずいこうね。";
+        triggerAnim('anim-jump');
       } else if (input.includes('おやすみ')) {
         responseText = "おやすみなさい...いい夢を見てね。ごろん。";
+        triggerAnim('anim-stretch');
       } else if (input.includes('可愛い') || input.includes('かわいい')) {
         responseText = "にゃふん♪ 嬉しいな。もっと撫でていいよ。";
+        triggerAnim('anim-swing');
       } else if (input.includes('なでなで')) {
         responseText = "ごろごろごろ...最高に気持ちいいにゃ...";
+        triggerAnim('anim-swing');
       } else {
         responseText = NAGI_RESPONSES[Math.floor(Math.random() * NAGI_RESPONSES.length)];
+        if (Math.random() > 0.8) triggerAnim('anim-jump');
       }
 
       setMessages(prev => [...prev, { id: Date.now(), text: responseText, sender: 'nagi' }]);
@@ -71,11 +85,12 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <div className="moon"></div>
-      <div className="stars"></div>
+      <div className="sun"></div>
+      <div className="clouds"></div>
       
       <div className="pet-display">
-        <div className="cat-image-container" onClick={() => {
+        <div className={`cat-image-container ${animClass}`} onClick={() => {
+          triggerAnim('anim-swing');
           setIsTyping(true);
           setTimeout(() => {
             setMessages(prev => [...prev, { id: Date.now(), text: "ごろごろごろ...（撫でられて喜んでいる）", sender: 'nagi' }]);
