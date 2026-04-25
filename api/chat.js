@@ -54,9 +54,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // Use gemini-1.5-flash for fast and cost-effective responses
+    // Use gemini-2.5-flash for fast and cost-effective responses
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: systemInstruction,
       generationConfig: {
         responseMimeType: "application/json",
@@ -116,8 +116,8 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Error in chat API:", error);
     return res.status(500).json({ 
-      error: "Failed to fetch response from AI: " + (error.message || String(error)),
-      reply: "ごめんね、エラーが起きたみたい：「" + (error.message || String(error)) + "」",
+      error: "Failed to fetch response from AI",
+      reply: "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。",
       emotion: "sad"
     });
   }
