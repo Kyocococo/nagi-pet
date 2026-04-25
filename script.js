@@ -113,7 +113,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!response.ok) {
-        throw new Error('API request failed');
+        let errorReply = null;
+        let errorEmotion = 'sad';
+        try {
+          const errorData = await response.json();
+          if (errorData.reply) {
+            errorReply = errorData.reply;
+            if (errorData.emotion) errorEmotion = errorData.emotion;
+          }
+        } catch (e) {}
+        
+        if (errorReply) {
+          removeTypingIndicator();
+          addMessage(errorReply, 'nagi');
+          handleEmotion(errorEmotion);
+          return;
+        }
+        throw new Error('API request failed with status ' + response.status);
       }
 
       const data = await response.json();
