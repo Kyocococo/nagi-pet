@@ -58,17 +58,35 @@ export default async function handler(req, res) {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
       systemInstruction: systemInstruction,
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
-    // Format history for Gemini API
-    let formattedHistory = history.map(msg => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.text }]
-    }));
+    // Format history for Gemini API safely (must start with 'user' and strictly alternate)
+    let formattedHistory = [];
+    let expectedRole = "user";
 
-    // Gemini API requires the first message in history to be from 'user'
-    while (formattedHistory.length > 0 && formattedHistory[0].role !== "user") {
-      formattedHistory.shift();
+    for (const msg of history) {
+      const role = msg.role === "user" ? "user" : "model";
+      const text = msg.text || "";
+      if (!text.trim()) continue;
+
+      if (formattedHistory.length === 0) {
+        // First message must be user
+        if (role === "user") {
+          formattedHistory.push({ role, parts: [{ text }] });
+          expectedRole = "model";
+        }
+      } else {
+        if (role === expectedRole) {
+          formattedHistory.push({ role, parts: [{ text }] });
+          expectedRole = role === "user" ? "model" : "user";
+        } else {
+          // If the same role appears consecutively, merge the text
+          formattedHistory[formattedHistory.length - 1].parts[0].text += "\n" + text;
+        }
+      }
     }
 
     const chat = model.startChat({
