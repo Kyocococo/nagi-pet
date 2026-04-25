@@ -54,9 +54,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // Use gemini-2.5-flash for fast and cost-effective responses
+    // Use gemini-2.5-flash-lite for higher rate limits on free tier
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       systemInstruction: systemInstruction,
       generationConfig: {
         responseMimeType: "application/json",
@@ -116,13 +116,12 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Error in chat API:", error);
     const isRateLimit = String(error).includes("429") || String(error).includes("exceeded your current quota");
-    const errMsg = String(error.message || error);
     
     return res.status(500).json({ 
       error: "Failed to fetch response from AI",
       reply: isRateLimit 
-        ? "にゃあ...少し話しすぎちゃって疲れちゃったみたい。(" + errMsg + ")"
-        : "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。(" + errMsg + ")",
+        ? "にゃあ...少し話しすぎちゃって疲れちゃったみたい。1分くらい休んでからまた話しかけてね。"
+        : "にゃあ...ちょっと調子が悪いみたい。後でもう一度話しかけてね。",
       emotion: "sleepy"
     });
   }
