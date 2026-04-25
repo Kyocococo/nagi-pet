@@ -10,6 +10,8 @@ Write-Host "Copying files..."
 Copy-Item "c:\Work\Google_Antigravity\AIPet\index.html" -Destination $deployDir
 Copy-Item "c:\Work\Google_Antigravity\AIPet\style.css" -Destination $deployDir
 Copy-Item "c:\Work\Google_Antigravity\AIPet\script.js" -Destination $deployDir
+Copy-Item "c:\Work\Google_Antigravity\AIPet\package.json" -Destination $deployDir
+Copy-Item "c:\Work\Google_Antigravity\AIPet\api" -Destination $deployDir -Recurse
 
 $imagePath = "C:\Users\kyoko\.gemini\antigravity\brain\8bb85f27-21fd-4933-8923-84aba674d14e\nagi_1777049000477.png"
 Copy-Item $imagePath -Destination "$deployDir\nagi.png"

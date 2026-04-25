@@ -1,49 +1,3 @@
-const DEFAULT_RESPONSES = [
-  "にゃーん...お疲れ様。無理しないでね。",
-  "ごろごろ...僕がそばにいるよ。",
-  "今日も一日頑張ったね。えらいえらい。",
-  "すりすり...少し休んだらどうかな？",
-  "ふわぁ...眠くなってきた？一緒に寝ようか。",
-  "いつも見守ってるからね。",
-  "にゃあ。あったかいお茶でも飲んで、リラックスしてね。",
-  "しっぽをゆらゆら...僕を撫でていいよ。",
-  "大丈夫、君のペースで進めばいいんだよ。",
-  "ごろん...たまには何も考えない時間も大切だよ。"
-];
-
-const SAD_RESPONSES = [
-  "にゃあ...悲しいことがあったの？僕が話を聞くよ。",
-  "すりすり...泣いてもいいんだよ。僕のモフモフで涙を拭いて。",
-  "辛かったね。僕がずっとそばにくっついているからね。",
-  "ごろごろ...明日はきっといい日になるにゃん。"
-];
-
-const HAPPY_RESPONSES = [
-  "にゃっふー！君が嬉しいと僕も嬉しいにゃ！",
-  "しっぽピン！何かいいことあったの？",
-  "ごろごろごろ♪ 僕も一緒に喜んじゃう！",
-  "えへへ、その笑顔が見られて僕も幸せだよ。"
-];
-
-const HUNGRY_RESPONSES = [
-  "にゃあ？お腹すいたの？僕もちゅ〜る食べたいな...",
-  "一緒にご飯にする？美味しいもの食べて元気出そう！",
-  "ぐ〜...僕のお腹も鳴っちゃった。何食べる？"
-];
-
-const PRAISE_RESPONSES = [
-  "にゃふん♪ もっと褒めていいよ！",
-  "ごろごろごろ...照れるにゃん...",
-  "えへへ、君に褒められるのが一番嬉しいな！"
-];
-
-const PLAY_RESPONSES = [
-  "にゃっ！遊ぶの！？やったー！",
-  "ダッシュ！おもちゃはどこ！？",
-  "捕まえるにゃん！それー！",
-  "ぐるぐるぐる！楽しいね！"
-];
-
 document.addEventListener('DOMContentLoaded', () => {
   const chatMessages = document.getElementById('chat-messages');
   const chatForm = document.getElementById('chat-form');
@@ -60,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   let isTyping = false;
+  // 会話履歴を保持する配列（Gemini APIに文脈を渡すため）
+  let chatHistory = [];
 
   function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -71,6 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     msgDiv.textContent = text;
     chatMessages.appendChild(msgDiv);
     scrollToBottom();
+    
+    // 履歴に追加（直近10往復程度を保持）
+    chatHistory.push({ role: sender === 'nagi' ? 'model' : 'user', text: text });
+    if (chatHistory.length > 20) {
+      chatHistory.shift();
+    }
   }
 
   function showTypingIndicator() {
@@ -107,62 +69,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
   }
 
-  function nagiRespond(userText) {
-    let responseText = "";
-    
-    // Play specific animation
-    if (userText.includes('遊んで') || userText.includes('あそんで') || userText.includes('遊ぼ')) {
-      responseText = PLAY_RESPONSES[Math.floor(Math.random() * PLAY_RESPONSES.length)];
-      triggerAnim('anim-jump', "ワクワク！");
-    } 
-    // Sad keywords
-    else if (userText.includes('悲しい') || userText.includes('辛い') || userText.includes('つらい') || userText.includes('泣きそう')) {
-      responseText = SAD_RESPONSES[Math.floor(Math.random() * SAD_RESPONSES.length)];
-      triggerAnim('anim-stretch', "寄り添い中");
+  // 感情に応じたアニメーションとステータスをマッピング
+  function handleEmotion(emotion) {
+    switch(emotion) {
+      case 'happy':
+        triggerAnim('anim-jump', "ご機嫌♪");
+        break;
+      case 'sad':
+        triggerAnim('anim-stretch', "寄り添い中");
+        break;
+      case 'hungry':
+        triggerAnim('anim-swing', "はらぺこ");
+        break;
+      case 'praise':
+        triggerAnim('anim-swing', "照れ照れ");
+        break;
+      case 'play':
+        triggerAnim('anim-jump', "ワクワク！");
+        break;
+      case 'sleepy':
+        triggerAnim('anim-stretch', "うとうと...");
+        break;
+      default:
+        // normal または不明な場合は何もしないか軽くランダム
+        if (Math.random() > 0.7) triggerAnim('anim-swing', "リラックス中");
+        break;
     }
-    // Happy keywords
-    else if (userText.includes('嬉しい') || userText.includes('うれしい') || userText.includes('楽しい') || userText.includes('たのしい')) {
-      responseText = HAPPY_RESPONSES[Math.floor(Math.random() * HAPPY_RESPONSES.length)];
-      triggerAnim('anim-jump', "ご機嫌♪");
-    }
-    // Hungry keywords
-    else if (userText.includes('お腹すいた') || userText.includes('おなかすいた') || userText.includes('ご飯') || userText.includes('ごはん')) {
-      responseText = HUNGRY_RESPONSES[Math.floor(Math.random() * HUNGRY_RESPONSES.length)];
-      triggerAnim('anim-swing', "はらぺこ");
-    }
-    // Praise keywords
-    else if (userText.includes('可愛い') || userText.includes('かわいい') || userText.includes('えらい') || userText.includes('天才') || userText.includes('大好き')) {
-      responseText = PRAISE_RESPONSES[Math.floor(Math.random() * PRAISE_RESPONSES.length)];
-      triggerAnim('anim-swing', "照れ照れ");
-    }
-    // Specific direct responses
-    else if (userText.includes('疲れた') || userText.includes('つかれた')) {
-      responseText = "よしよし...本当にお疲れ様。僕のふわふわの毛並みを想像して癒やされてね。";
-      triggerAnim('anim-stretch', "なぐさめ中");
-    } else if (userText.includes('おはよう')) {
-      responseText = "にゃあ！おはよう。今日も無理せずいこうね。";
-      triggerAnim('anim-jump', "元気いっぱい");
-    } else if (userText.includes('おやすみ')) {
-      responseText = "おやすみなさい...いい夢を見てね。ごろん。";
-      triggerAnim('anim-stretch', "うとうと...");
-    } else if (userText.includes('なでなで')) {
-      responseText = "ごろごろごろ...最高に気持ちいいにゃ...";
-      triggerAnim('anim-swing', "至福のひととき");
-    } 
-    // Default fallback
-    else {
-      responseText = DEFAULT_RESPONSES[Math.floor(Math.random() * DEFAULT_RESPONSES.length)];
-      if (Math.random() > 0.8) triggerAnim('anim-jump', "ご機嫌♪");
-    }
+  }
 
-    addMessage(responseText, 'nagi');
+  async function nagiRespond(userText) {
+    try {
+      // Vercel Serverless Function を呼び出す
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          message: userText,
+          // 現在のメッセージより前の履歴を送信（直前のユーザー入力は除く）
+          history: chatHistory.slice(0, -1) 
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const data = await response.json();
+      
+      removeTypingIndicator();
+      addMessage(data.reply, 'nagi');
+      handleEmotion(data.emotion);
+
+    } catch (error) {
+      console.error('Error fetching Nagi response:', error);
+      removeTypingIndicator();
+      addMessage("にゃあ...ごめんね、今はうまくお話しできないみたい。", 'nagi');
+      triggerAnim('anim-stretch', "考え中...");
+    }
   }
 
   chatInput.addEventListener('input', () => {
     sendButton.disabled = chatInput.value.trim() === '' || isTyping;
   });
 
-  chatForm.addEventListener('submit', (e) => {
+  chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = chatInput.value.trim();
     if (!text || isTyping) return;
@@ -175,13 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showTypingIndicator();
 
-    setTimeout(() => {
-      removeTypingIndicator();
-      nagiRespond(text);
-      isTyping = false;
-      chatInput.disabled = false;
-      chatInput.focus();
-    }, 1500 + Math.random() * 1000);
+    // AIの返答を待つ
+    await nagiRespond(text);
+
+    isTyping = false;
+    chatInput.disabled = false;
+    chatInput.focus();
   });
 
   catContainer.addEventListener('click', () => {
