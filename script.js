@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sendButton = document.getElementById('send-button');
   const catContainer = document.getElementById('cat-container');
   const catImage = document.getElementById('cat-image');
+  const statusBadge = document.querySelector('.status-badge');
 
   // Handle image error fallback
   catImage.addEventListener('error', function() {
@@ -92,51 +93,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function triggerAnim(animName, statusText) {
+    catContainer.classList.add(animName);
+    if (statusText) {
+      statusBadge.textContent = statusText;
+    }
+    
+    setTimeout(() => {
+      catContainer.classList.remove(animName);
+      if (statusText) {
+        statusBadge.textContent = "リラックス中";
+      }
+    }, 2000);
+  }
+
   function nagiRespond(userText) {
     let responseText = "";
     
     // Play specific animation
     if (userText.includes('遊んで') || userText.includes('あそんで') || userText.includes('遊ぼ')) {
       responseText = PLAY_RESPONSES[Math.floor(Math.random() * PLAY_RESPONSES.length)];
-      
-      // Add jump animation class
-      catContainer.classList.add('play-animation');
-      setTimeout(() => {
-        catContainer.classList.remove('play-animation');
-      }, 1000); // Wait for the animation to finish
+      triggerAnim('anim-jump', "ワクワク！");
     } 
     // Sad keywords
     else if (userText.includes('悲しい') || userText.includes('辛い') || userText.includes('つらい') || userText.includes('泣きそう')) {
       responseText = SAD_RESPONSES[Math.floor(Math.random() * SAD_RESPONSES.length)];
+      triggerAnim('anim-stretch', "寄り添い中");
     }
     // Happy keywords
     else if (userText.includes('嬉しい') || userText.includes('うれしい') || userText.includes('楽しい') || userText.includes('たのしい')) {
       responseText = HAPPY_RESPONSES[Math.floor(Math.random() * HAPPY_RESPONSES.length)];
+      triggerAnim('anim-jump', "ご機嫌♪");
     }
     // Hungry keywords
     else if (userText.includes('お腹すいた') || userText.includes('おなかすいた') || userText.includes('ご飯') || userText.includes('ごはん')) {
       responseText = HUNGRY_RESPONSES[Math.floor(Math.random() * HUNGRY_RESPONSES.length)];
+      triggerAnim('anim-swing', "はらぺこ");
     }
     // Praise keywords
     else if (userText.includes('可愛い') || userText.includes('かわいい') || userText.includes('えらい') || userText.includes('天才') || userText.includes('大好き')) {
       responseText = PRAISE_RESPONSES[Math.floor(Math.random() * PRAISE_RESPONSES.length)];
+      triggerAnim('anim-swing', "照れ照れ");
     }
     // Specific direct responses
     else if (userText.includes('疲れた') || userText.includes('つかれた')) {
       responseText = "よしよし...本当にお疲れ様。僕のふわふわの毛並みを想像して癒やされてね。";
+      triggerAnim('anim-stretch', "なぐさめ中");
     } else if (userText.includes('おはよう')) {
       responseText = "にゃあ！おはよう。今日も無理せずいこうね。";
+      triggerAnim('anim-jump', "元気いっぱい");
     } else if (userText.includes('おやすみ')) {
       responseText = "おやすみなさい...いい夢を見てね。ごろん。";
+      triggerAnim('anim-stretch', "うとうと...");
     } else if (userText.includes('なでなで')) {
       responseText = "ごろごろごろ...最高に気持ちいいにゃ...";
-      // Add a slight tilt animation
-      catContainer.style.transform = "rotate(5deg)";
-      setTimeout(() => { catContainer.style.transform = "rotate(0)"; }, 500);
+      triggerAnim('anim-swing', "至福のひととき");
     } 
     // Default fallback
     else {
       responseText = DEFAULT_RESPONSES[Math.floor(Math.random() * DEFAULT_RESPONSES.length)];
+      if (Math.random() > 0.8) triggerAnim('anim-jump', "ご機嫌♪");
     }
 
     addMessage(responseText, 'nagi');
@@ -174,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.disabled = true;
     sendButton.disabled = true;
     
+    triggerAnim('anim-swing', "喜んでる");
     showTypingIndicator();
     
     setTimeout(() => {
