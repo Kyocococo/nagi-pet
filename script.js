@@ -137,6 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
       removeTypingIndicator();
       addMessage(data.reply, 'nagi');
       handleEmotion(data.emotion);
+      
+      if (data.gift && data.gift.trim() !== "") {
+        setTimeout(() => {
+          addMessage(`🎁 凪くんが「${data.gift}」を拾ってきてくれました！`, 'system');
+          triggerAnim('anim-jump', "プレゼント！");
+        }, 500);
+      }
 
     } catch (error) {
       console.error('Error fetching Nagi response:', error);
